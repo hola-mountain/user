@@ -1,0 +1,28 @@
+
+
+spring:
+  application:
+    name: user-service
+  r2dbc:
+    url: r2dbc:mysql://15.164.98.73:3306/holamountain?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Seoul
+    username: minjunkang
+    password: alswnsrkdA1$
+
+server:
+  port: 8080
+#
+#eureka:
+#  instance:
+#    instance-id: ${spring.application.name}:${random.value}
+#  client:
+#    register-with-eureka: true
+#    fetch-registry: true
+#    service-url:
+#      defaultZone: http://127.0.0.1:8761/eureka
+
+
+logging:
+  level:
+    root: INFO
+    org.springframework.r2dbc: DEBUG
+
