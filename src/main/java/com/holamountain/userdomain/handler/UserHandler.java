@@ -4,7 +4,7 @@ package com.holamountain.userdomain.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.holamountain.userdomain.dto.UserDto;
-import com.holamountain.userdomain.dto.UserRegistrationResponse;
+import com.holamountain.userdomain.dto.response.UserRegistrationResponse;
 import com.holamountain.userdomain.model.UserEntity;
 import com.holamountain.userdomain.repository.UserRepository;
 import com.holamountain.userdomain.service.UserService;
@@ -12,6 +12,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
