@@ -18,7 +18,7 @@ public class DataSourceR2DBCConfig extends AbstractR2dbcConfiguration {
     @Bean("customR2ConnectionFactory")
     @Primary
     public ConnectionFactory connectionFactory() {
-        return ConnectionFactories.get("r2dbc:mysql://minjunkang:alswnsrkdA1$@15.164.98.73:3306/holamountain?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Seoul");
+        return ConnectionFactories.get("r2dbc:mysql://minjunkang:alswnsrkdA1$@15.164.98.73:3306/holamuser?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Seoul");
     }
 
     @Bean
