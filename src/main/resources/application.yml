@@ -2,12 +2,12 @@ spring:
   application:
     name: user-service
   r2dbc:
-    url: r2dbc:mysql://15.164.98.73:3306/holamountain?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Seoul
+    url: r2dbc:mysql://15.164.98.73:3306/holamuser?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Seoul
     username: minjunkang
     password: alswnsrkdA1$
 
 server:
-  port: 8080
+  port: 4500
 
 eureka:
   instance:
@@ -20,7 +20,6 @@ eureka:
 
 logging:
   level:
-    root: INFO
     org.springframework.r2dbc: DEBUG
 
 jwt:
