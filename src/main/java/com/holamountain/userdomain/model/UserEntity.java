@@ -1,7 +1,9 @@
 
 package com.holamountain.userdomain.model;
 
+import com.holamountain.userdomain.common.UserEnums.UserType;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -13,14 +15,14 @@ import java.sql.Timestamp;
 @Table(value = "users")
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor @Builder
 public class UserEntity {
     @Id
     @Column(value = "userId")
     private Long userId;
 
     @Column(value = "userType")
-    private String userType;
+    private UserType userType;
 
     @Column(value = "nickName")
     private String nickName;

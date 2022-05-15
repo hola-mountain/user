@@ -1,5 +1,3 @@
-
-
 spring:
   application:
     name: user-service
@@ -9,20 +7,23 @@ spring:
     password: alswnsrkdA1$
 
 server:
-  port: 8081
-#
-#eureka:
-#  instance:
-#    instance-id: ${spring.application.name}:${random.value}
-#  client:
-#    register-with-eureka: true
-#    fetch-registry: true
-#    service-url:
-#      defaultZone: http://127.0.0.1:8761/eureka
+  port: 8080
 
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${random.value}
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://15.165.192.190:8761/eureka/
 
 logging:
   level:
     root: INFO
     org.springframework.r2dbc: DEBUG
 
+jwt:
+  secret-key: aG9sYW0tcHJvamVjdC1zZWNyZXQta2V5LWNvZGVzdGF0ZQ==
+  accessExpires:  7200000
+  refreshExpires:  1210000000

@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class UserLoginResponse {
-    private String userId;
-    private String userType;
+    private Long userId;
+
+    private String accessToken;
+    private String refreshToken;
 }
