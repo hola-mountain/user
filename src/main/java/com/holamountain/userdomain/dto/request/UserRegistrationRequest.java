@@ -1,6 +1,6 @@
 package com.holamountain.userdomain.dto.request;
 
-import com.holamountain.userdomain.common.Message.ExceptionMessage;
+import com.holamountain.userdomain.common.Message.UsersExceptionMessage;
 import com.holamountain.userdomain.exception.RequestEmptyException;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -22,8 +22,8 @@ public class UserRegistrationRequest {
 
     public void verify() {
         if (StringUtils.isBlank(nickName))
-            throw new RequestEmptyException(ExceptionMessage.RequireUserNickNameException.getMessage());
+            throw new RequestEmptyException(UsersExceptionMessage.RequireUserNickNameException.getMessage());
         if (StringUtils.isBlank(password))
-            throw new RequestEmptyException(ExceptionMessage.RequireUserPasswordException.getMessage());
+            throw new RequestEmptyException(UsersExceptionMessage.RequireUserPasswordException.getMessage());
     }
 }

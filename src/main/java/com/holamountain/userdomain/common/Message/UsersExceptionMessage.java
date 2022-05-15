@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor @AllArgsConstructor
 @Getter
-public enum  ExceptionMessage {
+public enum UsersExceptionMessage {
     RequireUserNickNameException("BadRequestException", "닉네임을 입력해 주세요."),
     RequireUserPasswordException("BadRequestException", "비밀번호를 입력해 주세요."),
     HasNoUserException("BadRequestException", "회원정보를 확인해주세요."),

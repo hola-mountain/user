@@ -114,7 +114,7 @@ public class UserRouter {
         )
     })
     @Bean
-    public RouterFunction<ServerResponse> router(UserHandler userHandler) {
+    public RouterFunction<ServerResponse> usRouter(UserHandler userHandler) {
         return RouterFunctions.route()
             .path("/users", routerBuilder ->
                 routerBuilder.nest(accept(MediaType.APPLICATION_JSON), builder ->

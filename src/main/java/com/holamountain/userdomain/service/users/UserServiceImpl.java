@@ -2,13 +2,11 @@
 package com.holamountain.userdomain.service;
 
 import com.holamountain.userdomain.Utils.SHA256;
-import com.holamountain.userdomain.common.Message.ExceptionMessage;
+import com.holamountain.userdomain.common.Message.UsersExceptionMessage;
 import com.holamountain.userdomain.common.UserEnums.UserType;
 import com.holamountain.userdomain.dto.request.UserLoginRequest;
-import com.holamountain.userdomain.dto.request.UserMyInfoRequest;
 import com.holamountain.userdomain.dto.request.UserRegistrationRequest;
 import com.holamountain.userdomain.dto.response.UserLoginResponse;
-import com.holamountain.userdomain.dto.response.UserMyInfoResponse;
 import com.holamountain.userdomain.dto.response.UserRegistrationResponse;
 import com.holamountain.userdomain.exception.EmptyRequestException;
 import com.holamountain.userdomain.exception.FailUserRegistrationException;
@@ -17,6 +15,7 @@ import com.holamountain.userdomain.exception.UserRegistrationException;
 import com.holamountain.userdomain.jwt.JwtProvider;
 import com.holamountain.userdomain.model.UserEntity;
 import com.holamountain.userdomain.repository.UserRepository;
+import com.holamountain.userdomain.service.users.UserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -36,7 +35,7 @@ public class UserServiceImpl implements UserService {
                     request.verify();
                     return getLoginUser(request);
                 }
-        ).switchIfEmpty(Mono.error(new EmptyRequestException(ExceptionMessage.EmptyRequestMessage.getMessage())));
+        ).switchIfEmpty(Mono.error(new EmptyRequestException(UsersExceptionMessage.EmptyRequestMessage.getMessage())));
     }
 
     private Mono<UserLoginResponse> getLoginUser(UserLoginRequest userLoginRequest) {
@@ -46,7 +45,7 @@ public class UserServiceImpl implements UserService {
         return loginUser.hasElement()
                 .flatMap(tryLoginUser -> {
                     if (!tryLoginUser)
-                        return Mono.error(new UnAuthorizedException(ExceptionMessage.HasNoUserException.getMessage()));
+                        return Mono.error(new UnAuthorizedException(UsersExceptionMessage.HasNoUserException.getMessage()));
 
                     return makeMemberLoginResponse(loginUser);
                 });
@@ -67,14 +66,14 @@ public class UserServiceImpl implements UserService {
                     request.verify();
                     return userValidCheckAndRegistration(request, userType);
                 }
-        ).switchIfEmpty(Mono.error(new EmptyRequestException(ExceptionMessage.EmptyRequestMessage.getMessage())));
+        ).switchIfEmpty(Mono.error(new EmptyRequestException(UsersExceptionMessage.EmptyRequestMessage.getMessage())));
     }
 
     private Mono<UserRegistrationResponse> userValidCheckAndRegistration(UserRegistrationRequest request, UserType userType) {
         return userRepository.findByNickNameAndUserType(request.getNickName(), userType)
             .hasElement()
             .flatMap(alreadyMember -> {
-                if (alreadyMember) return Mono.error(new UserRegistrationException(ExceptionMessage.UserRegistrationDuplicationException.getMessage()));
+                if (alreadyMember) return Mono.error(new UserRegistrationException(UsersExceptionMessage.UserRegistrationDuplicationException.getMessage()));
                     return this.saveUser(request, userType)
                         .flatMap(savedUser -> Mono.just(
                                 UserRegistrationResponse.builder()
@@ -95,6 +94,6 @@ public class UserServiceImpl implements UserService {
         if (!StringUtils.isBlank(userRegistrationRequest.getEmail())) userEntity.setEmail(userRegistrationRequest.getEmail());
 
         return userRepository.save(userEntity)
-                .switchIfEmpty(Mono.error(new FailUserRegistrationException(ExceptionMessage.FailUserRegistrationMessage.getMessage())));
+                .switchIfEmpty(Mono.error(new FailUserRegistrationException(UsersExceptionMessage.FailUserRegistrationMessage.getMessage())));
     }
 }
