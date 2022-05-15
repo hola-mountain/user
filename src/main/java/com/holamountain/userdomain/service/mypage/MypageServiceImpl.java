@@ -60,6 +60,8 @@ public class MypageServiceImpl implements MypageService {
     private Flux<MyBadgeInfoResponse> getUserBadgeInfo(MyBadgeInfoRequest myBadgeInfoRequest) {
         Flux<AchievementEntity> loginUser = achievementRepository.findByUserId(myBadgeInfoRequest.getUserId());
 
+
+//        dd
         return loginUser.flatMap(tryUserInfo -> {
             if (tryUserInfo.getUserId() == null || tryUserInfo.getUserId() < 0) {
                 return Mono.error(new UnAuthorizedException(MypageExceptionMessage.NoDataFounedException.getMessage()));
