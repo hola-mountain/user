@@ -16,26 +16,26 @@ class MypageServiceImplTest {
     @Autowired
     private UserRepository userRepository;
 
-    @Test
-    public void test() {
-        Mono<UserEntity> dd =  userRepository.findByUserId(1L);
-
-        dd.flatMap(map -> {
-            System.out.println("123");
-
-            return null;
-        });
-    }
-
-    @Test
-    public void test2() {
-        Mono<UserEntity> loginUser = userRepository.findByNickNameAndPassword("MinJun", "dsadasdsad");
-
-        loginUser.flatMap(map -> {
-            System.out.println("123");
-
-            return null;
-        });
-    }
+//    @Test
+//    public void test() {
+//        Mono<UserEntity> dd =  userRepository.findByUserId(1L);
+//
+//        dd.flatMap(map -> {
+//            System.out.println("123");
+//
+//            return null;
+//        });
+//    }
+//
+//    @Test
+//    public void test2() {
+//        Mono<UserEntity> loginUser = userRepository.findByNickNameAndPassword("MinJun", "dsadasdsad");
+//
+//        loginUser.flatMap(map -> {
+//            System.out.println("123");
+//
+//            return null;
+//        });
+//    }
 
 }
