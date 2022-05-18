@@ -17,7 +17,7 @@ public class MypageRouter {
         return RouterFunctions.route()
                 .GET("/mypage/myInfo", mypageHandler::myInfo)
                 .GET("/mypage/badges", mypageHandler::myBadges)
-//            .PUT("/mypage/leave", mypageHandler::leave)
+                .PUT("/mypage/leave", mypageHandler::leave)
 //            .GET("/mypage/mountain/favorite", mypageHandler::myFavorite)
 //            .GET("/mypage/mountain/review", mypageHandler::myReview)
                 .build();
