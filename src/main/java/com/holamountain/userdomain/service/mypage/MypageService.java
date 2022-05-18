@@ -8,6 +8,8 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 public interface MypageService {
     Mono<MypageInfoResponse> userInfo(ServerRequest serverRequest);
 
@@ -15,5 +17,5 @@ public interface MypageService {
 
     Mono<MypageLeaveResponse> leave(ServerRequest serverRequest);
 
-    Mono<MypageLeaveResponse> myFavorite(ServerRequest serverRequest);
+    Mono<Map> myFavorite(ServerRequest serverRequest);
 }

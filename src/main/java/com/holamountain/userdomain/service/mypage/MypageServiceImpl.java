@@ -14,15 +14,16 @@ import com.holamountain.userdomain.model.UserEntity;
 import com.holamountain.userdomain.repository.AchievementRepository;
 import com.holamountain.userdomain.repository.MypageRepository;
 import com.holamountain.userdomain.repository.UserRepository;
-import com.holamountain.userdomain.webclient.WebClientConfg;
+import com.holamountain.userdomain.webclient.WebClientConfig;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +31,7 @@ public class MypageServiceImpl implements MypageService {
     private final MypageRepository mypageRepository;
     private final AchievementRepository achievementRepository;
     private final UserRepository userRepository;
-    private final WebClientConfg webClientConfg;
+    private final WebClientConfig webClientConfig;
 
     @Override
     public Mono<MypageInfoResponse> userInfo(ServerRequest serverRequest) {
@@ -100,9 +101,13 @@ public class MypageServiceImpl implements MypageService {
     }
 
     @Override
-    public Mono<MypageLeaveResponse> myFavorite(ServerRequest serverRequest) {
-//        webClientConfg.getMountainWebClinet()
-
-        return null;
+    public Mono<Map> myFavorite(ServerRequest serverRequest) {
+        return webClientConfig.getMountainWebClinet().get()
+                .uri(uriBuilder ->
+                        uriBuilder.path("/mountain/" + "1")
+                                .build()
+                )
+                .retrieve()
+                .bodyToMono(Map.class).log();
     }
 }

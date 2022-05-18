@@ -20,6 +20,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.Map;
+
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
 @RequiredArgsConstructor
@@ -57,7 +59,7 @@ public class MypageHandler {
 
 
     public Mono<ServerResponse> myFavorite(ServerRequest serverRequest) {
-        Mono<MypageLeaveResponse> leaveResponse =  mypageService.myFavorite(serverRequest)
+        Mono<Map> leaveResponse =  mypageService.myFavorite(serverRequest).log()
                 .subscribeOn(Schedulers.boundedElastic());
 
         return ok()
