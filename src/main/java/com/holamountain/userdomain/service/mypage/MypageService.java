@@ -7,7 +7,6 @@ import com.holamountain.userdomain.dto.response.UserLoginResponse;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import sun.invoke.empty.Empty;
 
 public interface MypageService {
     Mono<MypageInfoResponse> userInfo(ServerRequest serverRequest);

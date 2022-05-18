@@ -19,7 +19,6 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import sun.invoke.empty.Empty;
 
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
