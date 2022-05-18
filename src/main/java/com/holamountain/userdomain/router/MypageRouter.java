@@ -18,8 +18,8 @@ public class MypageRouter {
                 .GET("/mypage/myInfo/{userId}", mypageHandler::myInfo)
                 .GET("/mypage/badges/{userId}", mypageHandler::myBadges)
                 .PUT("/mypage/leave", mypageHandler::leave)
-            .GET("/mypage/mountain/favorite", mypageHandler::myFavorite)
-//            .GET("/mypage/mountain/review", mypageHandler::myReview)
+                .GET("/mypage/users/favorite/{userId}", mypageHandler::myFavorite)
+                .GET("/mypage/users/review/{userId}", mypageHandler::myReview)
                 .build();
     }
 }

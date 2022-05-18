@@ -3,9 +3,7 @@ package com.holamountain.userdomain.service.mypage;
 
 import com.holamountain.userdomain.common.Message.MypageExceptionMessage;
 import com.holamountain.userdomain.dto.request.UserLeaveRequest;
-import com.holamountain.userdomain.dto.response.MyBadgeInfoResponse;
-import com.holamountain.userdomain.dto.response.MypageInfoResponse;
-import com.holamountain.userdomain.dto.response.MypageLeaveResponse;
+import com.holamountain.userdomain.dto.response.*;
 import com.holamountain.userdomain.exception.EmptyRequestException;
 import com.holamountain.userdomain.exception.NoDataFounedException;
 import com.holamountain.userdomain.exception.ProcessingErrorException;
@@ -22,8 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -101,13 +97,38 @@ public class MypageServiceImpl implements MypageService {
     }
 
     @Override
-    public Mono<Map> myFavorite(ServerRequest serverRequest) {
-        return webClientConfig.getMountainWebClinet().get()
-                .uri(uriBuilder ->
-                        uriBuilder.path("/mountain/" + "1")
-                                .build()
-                )
-                .retrieve()
-                .bodyToMono(Map.class).log();
+    public Flux<MyFavoriteMountainResponse> myFavorite(ServerRequest serverRequest) {
+        return Flux.just(serverRequest.pathVariable("userId")).flatMap(searchInfoUserId -> {
+            if (StringUtils.isBlank(searchInfoUserId)) {
+                throw new EmptyRequestException(MypageExceptionMessage.EmptyRequestMessage.getMessage());
+            }
+
+            return webClientConfig.getMountainWebClinet().get()
+                    .uri(uriBuilder ->
+                            uriBuilder.path("/mountain/favorite/me")
+                                    .queryParam("userId", searchInfoUserId)
+                                    .build()
+                    )
+                    .retrieve()
+                    .bodyToFlux(MyFavoriteMountainResponse.class);
+        }).switchIfEmpty(Mono.error(new ProcessingErrorException(MypageExceptionMessage.ProcessingErrorException.getMessage())));
+    }
+
+    @Override
+    public Flux<MyMountainReviewResponse> myReview(ServerRequest serverRequest) {
+        return Flux.just(serverRequest.pathVariable("userId")).flatMap(searchInfoUserId -> {
+            if (StringUtils.isBlank(searchInfoUserId)) {
+                throw new EmptyRequestException(MypageExceptionMessage.EmptyRequestMessage.getMessage());
+            }
+
+            return webClientConfig.getMountainWebClinet().get()
+                    .uri(uriBuilder ->
+                            uriBuilder.path("/mountain/review/me")
+                                    .queryParam("userId", searchInfoUserId)
+                                    .build()
+                    )
+                    .retrieve()
+                    .bodyToFlux(MyMountainReviewResponse.class);
+        }).switchIfEmpty(Mono.error(new ProcessingErrorException(MypageExceptionMessage.ProcessingErrorException.getMessage())));
     }
 }

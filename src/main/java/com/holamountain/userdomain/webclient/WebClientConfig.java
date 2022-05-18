@@ -9,9 +9,6 @@ public class WebClientConfig {
 
     private WebClient mountainWebClinet;
 
-//    @Value("${domain.client.mountain.url}")
-    private String mountainUrl;
-
     public WebClientConfig(@Value("${domain.client.mountain.url}") String mounatinDomainUrl, WebClient.Builder builder) {
 
         this.mountainWebClinet = builder.baseUrl(mounatinDomainUrl).build();
