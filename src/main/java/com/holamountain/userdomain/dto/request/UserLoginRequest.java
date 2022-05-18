@@ -16,7 +16,7 @@ public class UserLoginRequest {
     private String password;
     private String userId;
 
-    public void verify() {
+    public void validCheck() {
         if (StringUtils.isBlank(nickName)) throw new RequestEmptyException(UsersExceptionMessage.RequireUserNickNameException.getMessage());
         if (StringUtils.isBlank(password)) throw new RequestEmptyException(UsersExceptionMessage.RequireUserPasswordException.getMessage());
     }

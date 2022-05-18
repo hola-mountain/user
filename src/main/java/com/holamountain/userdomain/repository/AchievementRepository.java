@@ -7,6 +7,6 @@ import reactor.core.publisher.Flux;
 
 @Repository
 public interface AchievementRepository extends ReactiveCrudRepository<AchievementEntity, Long> {
-    Flux<AchievementEntity> findByUserId(String userId);
+    Flux<AchievementEntity> findByUserId(Long userId);
 }
 

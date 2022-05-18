@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 public class UserLeaveRequest {
     private String userId;
 
-    public void verify() {
+    public void validCheck() {
         if (StringUtils.isBlank(userId))
             throw new RequestEmptyException(MypageExceptionMessage.UnAuthorizedException.getMessage());
     }

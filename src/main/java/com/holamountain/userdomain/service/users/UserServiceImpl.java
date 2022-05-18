@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
     public Mono<UserLoginResponse> userLogin(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(UserLoginRequest.class).flatMap(
                 request -> {
-                    request.verify();
+                    request.validCheck();
                     return getLoginUser(request);
                 }
         ).switchIfEmpty(Mono.error(new EmptyRequestException(UsersExceptionMessage.EmptyRequestMessage.getMessage())));
@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
     public Mono<UserRegistrationResponse> userRegistration(ServerRequest serverRequest, UserType userType) {
         return serverRequest.bodyToMono(UserRegistrationRequest.class).flatMap(
                 request -> {
-                    request.verify();
+                    request.validCheck();
                     return userValidCheckAndRegistration(request, userType);
                 }
         ).switchIfEmpty(Mono.error(new EmptyRequestException(UsersExceptionMessage.EmptyRequestMessage.getMessage())));

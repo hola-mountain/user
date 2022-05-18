@@ -20,7 +20,7 @@ public class UserRegistrationRequest {
     @Schema(nullable = true, description = "이메일은 선택값입니다.")
     private String email;
 
-    public void verify() {
+    public void validCheck() {
         if (StringUtils.isBlank(nickName))
             throw new RequestEmptyException(UsersExceptionMessage.RequireUserNickNameException.getMessage());
         if (StringUtils.isBlank(password))

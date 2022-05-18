@@ -13,5 +13,7 @@ public interface MypageService {
 
     Flux<MyBadgeInfoResponse> myBadges(ServerRequest serverRequest);
 
-//    Mono<MypageLeaveResponse> leave(ServerRequest serverRequest);
+    Mono<MypageLeaveResponse> leave(ServerRequest serverRequest);
+
+    Mono<MypageLeaveResponse> myFavorite(ServerRequest serverRequest);
 }

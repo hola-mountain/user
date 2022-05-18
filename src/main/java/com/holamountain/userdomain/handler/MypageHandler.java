@@ -28,7 +28,6 @@ public class MypageHandler {
     private final MypageService mypageService;
 
     public Mono<ServerResponse> myInfo(ServerRequest serverRequest) {
-
         Mono<MypageInfoResponse> response = mypageService.userInfo(serverRequest)
                 .subscribeOn(Schedulers.boundedElastic());
 
@@ -48,12 +47,21 @@ public class MypageHandler {
     }
 
     public Mono<ServerResponse> leave(ServerRequest serverRequest) {
-//        Mono<MypageLeaveResponse> leaveResponse =  mypageService.leave(serverRequest)
-//                .subscribeOn(Schedulers.boundedElastic());
-
+        Mono<MypageLeaveResponse> leaveResponse =  mypageService.leave(serverRequest)
+                .subscribeOn(Schedulers.boundedElastic());
 
         return ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .build();
+                .body(leaveResponse, MypageLeaveResponse.class);
+    }
+
+
+    public Mono<ServerResponse> myFavorite(ServerRequest serverRequest) {
+        Mono<MypageLeaveResponse> leaveResponse =  mypageService.myFavorite(serverRequest)
+                .subscribeOn(Schedulers.boundedElastic());
+
+        return ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(leaveResponse, MypageLeaveResponse.class);
     }
 }

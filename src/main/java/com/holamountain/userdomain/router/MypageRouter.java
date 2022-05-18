@@ -15,10 +15,10 @@ public class MypageRouter {
     @Bean
     public RouterFunction<ServerResponse> myRouter(MypageHandler mypageHandler) {
         return RouterFunctions.route()
-                .GET("/mypage/myInfo", mypageHandler::myInfo)
-                .GET("/mypage/badges", mypageHandler::myBadges)
+                .GET("/mypage/myInfo/{userId}", mypageHandler::myInfo)
+                .GET("/mypage/badges/{userId}", mypageHandler::myBadges)
                 .PUT("/mypage/leave", mypageHandler::leave)
-//            .GET("/mypage/mountain/favorite", mypageHandler::myFavorite)
+            .GET("/mypage/mountain/favorite", mypageHandler::myFavorite)
 //            .GET("/mypage/mountain/review", mypageHandler::myReview)
                 .build();
     }
