@@ -22,7 +22,7 @@ logging:
   level:
     org.springframework.r2dbc: DEBUG
 
-dmoain:
+domain:
   client:
     mountain:
       url: http://13.209.98.223:5000/
