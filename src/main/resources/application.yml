@@ -21,13 +21,13 @@ server:
   port: 4500
 
 eureka:
-      instance:
-        instance-id: ${spring.application.name}:${random.value}
-      client:
-        register-with-eureka: true
-        fetch-registry: true
-      service-url:
-        defaultZone: http://52.78.34.107:8761/eureka/
+  instance:
+    instance-id: ${spring.application.name}:${random.value}
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://52.78.34.107:8761/eureka/
 
 logging:
   level:
