@@ -1,23 +1,44 @@
 package com.holamountain.userdomain.kafka;
 
 import com.google.gson.Gson;
+import com.holamountain.userdomain.dto.response.kafka.ReviewCountResponse;
+import com.holamountain.userdomain.model.AchievementEntity;
 import com.holamountain.userdomain.repository.AchievementRepository;
-import org.springframework.http.converter.json.GsonBuilderUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 
 @Service
+@RequiredArgsConstructor
 public class KafkaConsumer {
-    AchievementRepository achievementRepository;
+    private final AchievementRepository achievementRepository;
 
-    @KafkaListener(topics = "mountainBadge", groupId = "foo")
+    @KafkaListener(topics = "mountainBadge", groupId = "mountainRating")
     public void consume(String message) throws IOException {
-//        Gson gson = new Gson();
-//
-//        achievementRepository.findByUserIdAndBadgeId();
-//
-//        return
+        Gson gson = new Gson();
+        ReviewCountResponse reviewCountResponse = gson.fromJson(message, ReviewCountResponse.class);
+        Long standardBadgeId = new Long(1);
+
+        achievementRepository.findByUserIdAndBadgeId(reviewCountResponse.getUserId(), standardBadgeId).hasElement()
+                .map(user -> {
+                    if (!user)
+                        return registrationArchievement(reviewCountResponse.getUserId(), standardBadgeId).subscribe();
+                    return user;
+                }).subscribe();
+
+        System.out.println("Sucess");
+    }
+
+    private Mono<AchievementEntity> registrationArchievement(Long userId, Long badgeId) {
+        AchievementEntity achievementEntity = AchievementEntity.builder()
+                .achievementNum(new Long(1))
+                .badgeId(badgeId)
+                .userId(userId)
+                .build();
+
+        return achievementRepository.save(achievementEntity).log();
     }
 }

@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 
 @Component
-@Order(-2) // 스프링에서 처리되는 에러 치리를 중간에 가로채서 따로 처리한 내용으로 반환한다. 스프링의 기본 에러 처리 Order는 `-1` 이다.
+@Order(-2)
 public class ExceptionHandler extends AbstractErrorWebExceptionHandler {
 
     public ExceptionHandler(UserErrorAttributes userErrorAttributes, WebProperties.Resources resources, ApplicationContext applicationContext, ServerCodecConfigurer serverCodecConfigurer) {

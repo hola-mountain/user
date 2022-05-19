@@ -73,10 +73,10 @@ public class MypageServiceImpl implements MypageService {
 
             return Mono.zip(Mono.just(tryUserInfo), badgeRepository.findById(tryUserInfo.getBadgeId()))
                     .map(userBadgeInfo -> new MyBadgeInfoResponse(userBadgeInfo.getT1().getAchievementId()
-                                                                ,userBadgeInfo.getT1().getAchievementNum()
-                            ,userBadgeInfo.getT1().getBadgeId()
-                            ,userBadgeInfo.getT1().getUserId()
-                            ,userBadgeInfo.getT2().getBadgeType()
+                                                                 ,userBadgeInfo.getT1().getAchievementNum()
+                                                                 ,userBadgeInfo.getT1().getBadgeId()
+                                                                 ,userBadgeInfo.getT1().getUserId()
+                                                                 ,userBadgeInfo.getT2().getBadgeType()
                     ));
         });
     }
