@@ -12,4 +12,5 @@ public class MyBadgeInfoResponse {
     private Long achievementNum;
     private Long badgeId;
     private Long userId;
+    private String badgeType;
 }

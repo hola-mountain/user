@@ -1,4 +1,4 @@
-//package com.holamountain.userdomain.dto.request.kafka;
+//package com.holamountain.userdomain.kafka;
 //
 //import com.holamountain.userdomain.dto.response.kafka.ReviewCountResponse;
 //import lombok.RequiredArgsConstructor;
@@ -8,7 +8,7 @@
 //@Service
 //@RequiredArgsConstructor
 //public class KafkaProducer {
-//    private static final String TOPIC = "badgeAlarm";
+//    private static final String TOPIC = "mountainBadge";
 //
 //    private final KafkaTemplate<String, ReviewCountResponse> kafkaTemplate;
 //

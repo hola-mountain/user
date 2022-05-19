@@ -8,8 +8,10 @@ import com.holamountain.userdomain.exception.EmptyRequestException;
 import com.holamountain.userdomain.exception.NoDataFounedException;
 import com.holamountain.userdomain.exception.ProcessingErrorException;
 import com.holamountain.userdomain.exception.UnAuthorizedException;
+import com.holamountain.userdomain.model.BadgeEntity;
 import com.holamountain.userdomain.model.UserEntity;
 import com.holamountain.userdomain.repository.AchievementRepository;
+import com.holamountain.userdomain.repository.BadgeRepository;
 import com.holamountain.userdomain.repository.MypageRepository;
 import com.holamountain.userdomain.repository.UserRepository;
 import com.holamountain.userdomain.webclient.WebClientConfig;
@@ -27,6 +29,7 @@ public class MypageServiceImpl implements MypageService {
     private final MypageRepository mypageRepository;
     private final AchievementRepository achievementRepository;
     private final UserRepository userRepository;
+    private final BadgeRepository badgeRepository;
     private final WebClientConfig webClientConfig;
 
     @Override
@@ -68,7 +71,13 @@ public class MypageServiceImpl implements MypageService {
                 return Mono.error(new UnAuthorizedException(MypageExceptionMessage.NoDataFounedException.getMessage()));
             }
 
-            return Flux.just(new MyBadgeInfoResponse(tryUserInfo.getAchievementId(), tryUserInfo.getAchievementNum(), tryUserInfo.getBadgeId(), tryUserInfo.getUserId()));
+            return Mono.zip(Mono.just(tryUserInfo), badgeRepository.findById(tryUserInfo.getBadgeId()))
+                    .map(userBadgeInfo -> new MyBadgeInfoResponse(userBadgeInfo.getT1().getAchievementId()
+                                                                ,userBadgeInfo.getT1().getAchievementNum()
+                            ,userBadgeInfo.getT1().getBadgeId()
+                            ,userBadgeInfo.getT1().getUserId()
+                            ,userBadgeInfo.getT2().getBadgeType()
+                    ));
         });
     }
 
