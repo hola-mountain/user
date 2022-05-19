@@ -1,18 +1,14 @@
-package com.holamountain.userdomain.dto.request;
+package com.holamountain.userdomain.dto.request.users;
 
 import com.holamountain.userdomain.common.Message.MypageExceptionMessage;
 import com.holamountain.userdomain.exception.RequestEmptyException;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 
-@AllArgsConstructor
-@NoArgsConstructor
+@AllArgsConstructor @NoArgsConstructor
 @Getter
 @ToString
-public class MypageInfoRequest {
+public class UserLeaveRequest {
     private String userId;
 
     public void validCheck() {

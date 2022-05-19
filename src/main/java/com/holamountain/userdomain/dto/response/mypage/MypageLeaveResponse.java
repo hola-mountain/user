@@ -1,4 +1,4 @@
-package com.holamountain.userdomain.dto.response;
+package com.holamountain.userdomain.dto.response.mypage;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

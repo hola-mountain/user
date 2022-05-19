@@ -1,4 +1,4 @@
-package com.holamountain.userdomain.dto.response;
+package com.holamountain.userdomain.dto.response.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -2,8 +2,8 @@
 package com.holamountain.userdomain.handler;
 
 import com.holamountain.userdomain.common.UserEnums.UserType;
-import com.holamountain.userdomain.dto.response.UserLoginResponse;
-import com.holamountain.userdomain.dto.response.UserRegistrationResponse;
+import com.holamountain.userdomain.dto.response.users.UserLoginResponse;
+import com.holamountain.userdomain.dto.response.users.UserRegistrationResponse;
 import com.holamountain.userdomain.service.users.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;

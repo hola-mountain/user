@@ -1,4 +1,4 @@
-package com.holamountain.userdomain.dto.request;
+package com.holamountain.userdomain.dto.request.mypage;
 
 import com.holamountain.userdomain.common.Message.MypageExceptionMessage;
 import com.holamountain.userdomain.exception.RequestEmptyException;
@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 @NoArgsConstructor
 @Getter
 @ToString
-public class MyBadgeInfoRequest {
+public class MypageInfoRequest {
     private String userId;
 
     public void validCheck() {

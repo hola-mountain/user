@@ -2,8 +2,8 @@ package com.holamountain.userdomain.service.mypage;
 
 
 import com.holamountain.userdomain.common.Message.MypageExceptionMessage;
-import com.holamountain.userdomain.dto.request.UserLeaveRequest;
-import com.holamountain.userdomain.dto.response.*;
+import com.holamountain.userdomain.dto.request.users.UserLeaveRequest;
+import com.holamountain.userdomain.dto.response.mypage.*;
 import com.holamountain.userdomain.exception.EmptyRequestException;
 import com.holamountain.userdomain.exception.NoDataFounedException;
 import com.holamountain.userdomain.exception.ProcessingErrorException;
@@ -47,7 +47,7 @@ public class MypageServiceImpl implements MypageService {
             }
 
             return Mono.just(new MypageInfoResponse(userInfo.getEmail(), userInfo.getNickName()));
-        }).switchIfEmpty(Mono.error(new ProcessingErrorException(MypageExceptionMessage.ProcessingErrorException.getMessage())));
+        });
     }
 
     @Override
@@ -59,7 +59,7 @@ public class MypageServiceImpl implements MypageService {
 
                     return getUserBadgeInfo(searchInfoUserId);
                 }
-        ).switchIfEmpty(Mono.error(new EmptyRequestException(MypageExceptionMessage.UnAuthorizedException.getMessage())));
+        );
     }
 
     private Flux<MyBadgeInfoResponse> getUserBadgeInfo(String userId) {
@@ -78,7 +78,7 @@ public class MypageServiceImpl implements MypageService {
                     user.validCheck();
                     return leaveUser(user);
                 }
-        ).switchIfEmpty(Mono.error(new EmptyRequestException(MypageExceptionMessage.EmptyRequestMessage.getMessage())));
+        );
     }
 
     private Mono<MypageLeaveResponse> leaveUser(UserLeaveRequest userLeaveRequest) {
@@ -111,7 +111,7 @@ public class MypageServiceImpl implements MypageService {
                     )
                     .retrieve()
                     .bodyToFlux(MyFavoriteMountainResponse.class);
-        }).switchIfEmpty(Mono.error(new ProcessingErrorException(MypageExceptionMessage.ProcessingErrorException.getMessage())));
+        });
     }
 
     @Override
@@ -129,6 +129,6 @@ public class MypageServiceImpl implements MypageService {
                     )
                     .retrieve()
                     .bodyToFlux(MyMountainReviewResponse.class);
-        }).switchIfEmpty(Mono.error(new ProcessingErrorException(MypageExceptionMessage.ProcessingErrorException.getMessage())));
+        });
     }
 }

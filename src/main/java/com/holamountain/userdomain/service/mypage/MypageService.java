@@ -1,6 +1,6 @@
 package com.holamountain.userdomain.service.mypage;
 
-import com.holamountain.userdomain.dto.response.*;
+import com.holamountain.userdomain.dto.response.mypage.*;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

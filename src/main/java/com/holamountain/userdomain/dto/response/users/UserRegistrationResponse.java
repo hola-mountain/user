@@ -1,5 +1,5 @@
 
-package com.holamountain.userdomain.dto.response;
+package com.holamountain.userdomain.dto.response.users;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

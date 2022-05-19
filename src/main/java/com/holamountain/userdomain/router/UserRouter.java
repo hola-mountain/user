@@ -1,11 +1,11 @@
 
 package com.holamountain.userdomain.router;
 
-import com.holamountain.userdomain.dto.request.UserLoginRequest;
-import com.holamountain.userdomain.dto.request.UserRegistrationRequest;
-import com.holamountain.userdomain.dto.response.ExceptionReponse;
-import com.holamountain.userdomain.dto.response.UserLoginResponse;
-import com.holamountain.userdomain.dto.response.UserRegistrationResponse;
+import com.holamountain.userdomain.dto.request.users.UserLoginRequest;
+import com.holamountain.userdomain.dto.request.users.UserRegistrationRequest;
+import com.holamountain.userdomain.dto.response.exception.ExceptionReponse;
+import com.holamountain.userdomain.dto.response.users.UserLoginResponse;
+import com.holamountain.userdomain.dto.response.users.UserRegistrationResponse;
 import com.holamountain.userdomain.handler.UserHandler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

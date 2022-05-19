@@ -1,6 +1,7 @@
 package com.holamountain.userdomain.handler;
 
-import com.holamountain.userdomain.dto.response.*;
+import com.holamountain.userdomain.dto.response.mypage.*;
+import com.holamountain.userdomain.dto.response.users.UserLoginResponse;
 import com.holamountain.userdomain.service.mypage.MypageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;

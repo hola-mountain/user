@@ -1,4 +1,4 @@
-package com.holamountain.userdomain.dto.request;
+package com.holamountain.userdomain.dto.request.users;
 
 import com.holamountain.userdomain.common.Message.UsersExceptionMessage;
 import com.holamountain.userdomain.exception.RequestEmptyException;
