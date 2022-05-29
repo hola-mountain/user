@@ -16,7 +16,7 @@ import java.io.IOException;
 public class KafkaConsumer {
     private final AchievementRepository achievementRepository;
 
-    @KafkaListener(topics = "mountainBadge", groupId = "mountainRating")
+    @KafkaListener(topics = "mountainbadge", groupId = "mountainRating")
     public void consume(String message) throws IOException {
         Gson gson = new Gson();
         ReviewCountResponse reviewCountResponse = gson.fromJson(message, ReviewCountResponse.class);
