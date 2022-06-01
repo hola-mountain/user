@@ -1,11 +1,13 @@
 
-package com.holamountain.userdomain.service;
+package com.holamountain.userdomain.service.users;
 
 import com.holamountain.userdomain.Utils.SHA256;
 import com.holamountain.userdomain.common.Message.UsersExceptionMessage;
 import com.holamountain.userdomain.common.UserEnums.UserType;
+import com.holamountain.userdomain.dto.request.jwt.JwtTokenRequest;
 import com.holamountain.userdomain.dto.request.users.UserLoginRequest;
 import com.holamountain.userdomain.dto.request.users.UserRegistrationRequest;
+import com.holamountain.userdomain.dto.response.jwt.JwtTokenResponse;
 import com.holamountain.userdomain.dto.response.users.UserLoginResponse;
 import com.holamountain.userdomain.dto.response.users.UserRegistrationResponse;
 import com.holamountain.userdomain.exception.EmptyRequestException;
@@ -13,20 +15,24 @@ import com.holamountain.userdomain.exception.FailUserRegistrationException;
 import com.holamountain.userdomain.exception.UnAuthorizedException;
 import com.holamountain.userdomain.exception.UserRegistrationException;
 import com.holamountain.userdomain.jwt.JwtProvider;
+import com.holamountain.userdomain.jwt.JwtTokenInfo;
 import com.holamountain.userdomain.model.UserEntity;
 import com.holamountain.userdomain.repository.UserRepository;
-import com.holamountain.userdomain.service.users.UserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
+
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
+    private final RedisTemplate redisTemplate;
 
     @Override
     public Mono<UserLoginResponse> userLogin(ServerRequest serverRequest) {
@@ -54,8 +60,11 @@ public class UserServiceImpl implements UserService {
     private Mono<UserLoginResponse> makeMemberLoginResponse(Mono<UserEntity> userEntity) {
         return userEntity.flatMap(user -> {
             String accessToken = jwtProvider.createAccessJwtToken(user);
-            String refreshToken = jwtProvider.createRefreshJwtToken(user);
-            return Mono.just(new UserLoginResponse(user.getUserId(), accessToken, refreshToken));
+            JwtTokenInfo refreshTokenInfo = jwtProvider.createRefreshJwtToken(user);
+
+            return Mono.just(new UserLoginResponse(user.getUserId()
+                    , accessToken
+                    , refreshTokenInfo.getRefreshToken()));
         });
     }
 
@@ -71,29 +80,78 @@ public class UserServiceImpl implements UserService {
 
     private Mono<UserRegistrationResponse> userValidCheckAndRegistration(UserRegistrationRequest request, UserType userType) {
         return userRepository.findByNickNameAndUserType(request.getNickName(), userType)
-            .hasElement()
-            .flatMap(alreadyMember -> {
-                if (alreadyMember) return Mono.error(new UserRegistrationException(UsersExceptionMessage.UserRegistrationDuplicationException.getMessage()));
-                    return this.saveUser(request, userType)
-                        .flatMap(savedUser -> Mono.just(
-                                UserRegistrationResponse.builder()
-                                        .userId(savedUser.getUserId())
-                                        .build()
-                        ));
-                }
-        );
+                .hasElement()
+                .flatMap(alreadyMember -> {
+                            if (alreadyMember)
+                                return Mono.error(new UserRegistrationException(UsersExceptionMessage.UserRegistrationDuplicationException.getMessage()));
+                            return this.saveUser(request, userType)
+                                    .flatMap(savedUser -> Mono.just(
+                                            UserRegistrationResponse.builder()
+                                                    .userId(savedUser.getUserId())
+                                                    .build()
+                                    ));
+                        }
+                );
     }
 
     private Mono<UserEntity> saveUser(UserRegistrationRequest userRegistrationRequest, UserType userType) {
         UserEntity userEntity = UserEntity.builder()
-                                    .nickName(userRegistrationRequest.getNickName())
-                                    .password(SHA256.encrypt(userRegistrationRequest.getPassword()))
-                                    .userType(userType)
-                                    .build();
+                .nickName(userRegistrationRequest.getNickName())
+                .password(SHA256.encrypt(userRegistrationRequest.getPassword()))
+                .userType(userType)
+                .build();
 
-        if (!StringUtils.isBlank(userRegistrationRequest.getEmail())) userEntity.setEmail(userRegistrationRequest.getEmail());
+        if (!StringUtils.isBlank(userRegistrationRequest.getEmail()))
+            userEntity.setEmail(userRegistrationRequest.getEmail());
 
         return userRepository.save(userEntity)
                 .switchIfEmpty(Mono.error(new FailUserRegistrationException(UsersExceptionMessage.FailUserRegistrationMessage.getMessage())));
+    }
+
+    @Override
+    public Mono<JwtTokenResponse> reIssueAccessJwtToken(ServerRequest serverRequest) {
+        return serverRequest.bodyToMono(JwtTokenRequest.class).flatMap(
+                request -> {
+                    request.validCheck();
+                    return validCheckJwtTokenInfo(request);
+                }
+        ).switchIfEmpty(Mono.error(new EmptyRequestException(UsersExceptionMessage.EmptyRequestMessage.getMessage())));
+    }
+
+    public Mono<JwtTokenResponse> validCheckJwtTokenInfo(JwtTokenRequest jwtTokenRequest) {
+        Long userId = Long.parseLong(jwtProvider.getUserIdFromAccessToken(jwtTokenRequest.getAccessToken()));
+        Mono<UserEntity> loginedUser = userRepository.findById(userId);
+
+        return loginedUser.hasElement()
+                .flatMap(user -> {
+                    if (!user)
+                        return Mono.error(new UnAuthorizedException(UsersExceptionMessage.HasNoUserException.getMessage()));
+
+                    String refreshToken = (String) redisTemplate.opsForValue().get("RT:" + userId);
+                    if (!refreshToken.equals(jwtTokenRequest.getRefreshToken())) {
+                        return Mono.error(new UnAuthorizedException(UsersExceptionMessage.UnAuthorizedException.getMessage()));
+                    }
+
+                    return getJwtTokenInfo(loginedUser);
+                });
+    }
+
+
+    public Mono<JwtTokenResponse> getJwtTokenInfo(Mono<UserEntity> userEntityMono) {
+        return userEntityMono.flatMap(user -> {
+            String accessToken = jwtProvider.createAccessJwtToken(user);
+            JwtTokenInfo refreshTokenInfo = jwtProvider.createRefreshJwtToken(user);
+
+            redisTemplate.opsForValue()
+                    .set("RT:" + refreshTokenInfo.getUserId()
+                            , refreshTokenInfo.getRefreshToken()
+                            , refreshTokenInfo.getRefreshTokenExpirationTime().getTime()
+                            , TimeUnit.MILLISECONDS);
+
+            return Mono.just(JwtTokenResponse.builder()
+                    .accessToken(accessToken)
+                    .refreshToken(refreshTokenInfo.getRefreshToken())
+                    .build());
+        });
     }
 }

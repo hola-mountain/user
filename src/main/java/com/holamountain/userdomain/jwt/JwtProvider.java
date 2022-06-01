@@ -35,15 +35,29 @@ public class JwtProvider {
                 .compact();
     }
 
-    public String createRefreshJwtToken(UserEntity userEntity) {
+    public JwtTokenInfo createRefreshJwtToken(UserEntity userEntity) {
         Date expiration = new Date(System.currentTimeMillis() + Long.parseLong(refreshExpiresString));
         SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes());
 
-        return Jwts.builder()
-                .claim("userId", userEntity.getUserId())
-                .claim("userType", userEntity.getUserType())
-                .signWith(key, SignatureAlgorithm.HS256) // 해시값
-                .setExpiration(expiration) // 만료시간
-                .compact();
+        return JwtTokenInfo.builder()
+                .userId(userEntity.getUserId())
+                .refreshToken(Jwts.builder()
+                                    .claim("userId", userEntity.getUserId())
+                                    .claim("userType", userEntity.getUserType())
+                                    .signWith(key, SignatureAlgorithm.HS256) // 해시값
+                                    .setExpiration(expiration) // 만료시간
+                                    .compact())
+                .refreshTokenExpirationTime(expiration)
+                .build();
+    }
+
+    public String getUserIdFromAccessToken(String accessToken) {
+        SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody().get("userId").toString();
+    }
+
+    public String getUserTypeFromAccessToken(String accessToken) {
+        SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody().get("userType").toString();
     }
 }

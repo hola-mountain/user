@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor @AllArgsConstructor
 @Getter
 public enum UsersExceptionMessage {
+    UnAuthorizedException("UnAuthorizedException", "재로그인해 주세요."),
+    RequireArgumentException("RequireArgumentException", "필수인자값을 확인해주세요."),
     RequireUserNickNameException("BadRequestException", "닉네임을 입력해 주세요."),
     RequireUserPasswordException("BadRequestException", "비밀번호를 입력해 주세요."),
     HasNoUserException("BadRequestException", "회원정보를 확인해주세요."),

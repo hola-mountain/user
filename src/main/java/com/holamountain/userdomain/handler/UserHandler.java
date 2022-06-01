@@ -2,6 +2,7 @@
 package com.holamountain.userdomain.handler;
 
 import com.holamountain.userdomain.common.UserEnums.UserType;
+import com.holamountain.userdomain.dto.response.jwt.JwtTokenResponse;
 import com.holamountain.userdomain.dto.response.users.UserLoginResponse;
 import com.holamountain.userdomain.dto.response.users.UserRegistrationResponse;
 import com.holamountain.userdomain.service.users.UserService;
@@ -22,7 +23,7 @@ public class UserHandler {
 
     public Mono<ServerResponse> login(ServerRequest serverRequest) {
 
-        Mono<UserLoginResponse> response = userService.userLogin(serverRequest)
+        Mono<UserLoginResponse> response = userService.userLogin(serverRequest).log()
                 .subscribeOn(Schedulers.boundedElastic());
 
         return ok()
@@ -41,5 +42,15 @@ public class UserHandler {
         return ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(response, UserRegistrationResponse.class);
+    }
+
+
+    public Mono<ServerResponse> reIssue(ServerRequest request) {
+        Mono<JwtTokenResponse> response = userService.reIssueAccessJwtToken(request).log()
+                .subscribeOn(Schedulers.boundedElastic());
+
+        return ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(response, JwtTokenResponse.class);
     }
 }

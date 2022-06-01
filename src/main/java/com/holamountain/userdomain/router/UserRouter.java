@@ -120,7 +120,7 @@ public class UserRouter {
                     builder
                         .POST("/join", userHandler::join)
                         .POST("/login", userHandler::login)
-//                        .POST("me", userHandler:myInfo)
+                        .POST("/reissue", userHandler::reIssue)
                 )
             )
             .build();
