@@ -4,6 +4,7 @@ package com.holamountain.userdomain.handler;
 import com.holamountain.userdomain.common.UserEnums.UserType;
 import com.holamountain.userdomain.dto.response.jwt.JwtTokenResponse;
 import com.holamountain.userdomain.dto.response.users.UserLoginResponse;
+import com.holamountain.userdomain.dto.response.users.UserLogoutResponse;
 import com.holamountain.userdomain.dto.response.users.UserRegistrationResponse;
 import com.holamountain.userdomain.service.users.UserService;
 import lombok.RequiredArgsConstructor;
@@ -44,9 +45,17 @@ public class UserHandler {
                 .body(response, UserRegistrationResponse.class);
     }
 
-
     public Mono<ServerResponse> reIssue(ServerRequest request) {
         Mono<JwtTokenResponse> response = userService.reIssueAccessJwtToken(request).log()
+                .subscribeOn(Schedulers.boundedElastic());
+
+        return ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(response, JwtTokenResponse.class);
+    }
+
+    public Mono<ServerResponse> logout(ServerRequest request) {
+        Mono<UserLogoutResponse> response = userService.userLogout(request).log()
                 .subscribeOn(Schedulers.boundedElastic());
 
         return ok()

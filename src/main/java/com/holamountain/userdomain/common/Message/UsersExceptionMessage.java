@@ -15,7 +15,8 @@ public enum UsersExceptionMessage {
     HasNoUserException("BadRequestException", "회원정보를 확인해주세요."),
     EmptyRequestMessage("BadRequestException", "입력값이 없습니다."),
     UserRegistrationDuplicationException("BadRequestException", "이미 등록된 회원입니다."),
-    FailUserRegistrationMessage("BadRequestException", "등록이 실패했습니다. 다시 시도해 주세요.");
+    FailUserRegistrationMessage("BadRequestException", "등록이 실패했습니다. 다시 시도해 주세요."),
+    FailUserLogoutMessage("FailUserLogoutMessage", "로그아웃에 실패했습니다. 다시 시도해 주세요.");
 
     private String type;
     private String message;

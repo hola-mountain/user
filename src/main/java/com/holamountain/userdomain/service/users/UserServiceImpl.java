@@ -6,14 +6,13 @@ import com.holamountain.userdomain.common.Message.UsersExceptionMessage;
 import com.holamountain.userdomain.common.UserEnums.UserType;
 import com.holamountain.userdomain.dto.request.jwt.JwtTokenRequest;
 import com.holamountain.userdomain.dto.request.users.UserLoginRequest;
+import com.holamountain.userdomain.dto.request.users.UserLogoutRequest;
 import com.holamountain.userdomain.dto.request.users.UserRegistrationRequest;
 import com.holamountain.userdomain.dto.response.jwt.JwtTokenResponse;
 import com.holamountain.userdomain.dto.response.users.UserLoginResponse;
+import com.holamountain.userdomain.dto.response.users.UserLogoutResponse;
 import com.holamountain.userdomain.dto.response.users.UserRegistrationResponse;
-import com.holamountain.userdomain.exception.EmptyRequestException;
-import com.holamountain.userdomain.exception.FailUserRegistrationException;
-import com.holamountain.userdomain.exception.UnAuthorizedException;
-import com.holamountain.userdomain.exception.UserRegistrationException;
+import com.holamountain.userdomain.exception.*;
 import com.holamountain.userdomain.jwt.JwtProvider;
 import com.holamountain.userdomain.jwt.JwtTokenInfo;
 import com.holamountain.userdomain.model.UserEntity;
@@ -61,6 +60,12 @@ public class UserServiceImpl implements UserService {
         return userEntity.flatMap(user -> {
             String accessToken = jwtProvider.createAccessJwtToken(user);
             JwtTokenInfo refreshTokenInfo = jwtProvider.createRefreshJwtToken(user);
+
+            redisTemplate.opsForValue()
+                    .set("RT:" + refreshTokenInfo.getUserId()
+                            ,refreshTokenInfo.getRefreshToken()
+                            ,refreshTokenInfo.getRefreshTokenExpirationTime().getTime()
+                            ,TimeUnit.MILLISECONDS);
 
             return Mono.just(new UserLoginResponse(user.getUserId()
                     , accessToken
@@ -136,7 +141,6 @@ public class UserServiceImpl implements UserService {
                 });
     }
 
-
     public Mono<JwtTokenResponse> getJwtTokenInfo(Mono<UserEntity> userEntityMono) {
         return userEntityMono.flatMap(user -> {
             String accessToken = jwtProvider.createAccessJwtToken(user);
@@ -153,5 +157,20 @@ public class UserServiceImpl implements UserService {
                     .refreshToken(refreshTokenInfo.getRefreshToken())
                     .build());
         });
+    }
+
+    @Override
+    public Mono<UserLogoutResponse> userLogout(ServerRequest serverRequest) {
+        return serverRequest.bodyToMono(UserLogoutRequest.class).flatMap(
+                request -> {
+                    if (!redisTemplate.delete("RT:" + request.getUserId())) {
+                        return Mono.error(new ProcessingErrorException(UsersExceptionMessage.FailUserLogoutMessage.getMessage()));
+                    }
+
+                    UserLogoutResponse userLogoutResponse = UserLogoutResponse.builder().build();
+                    userLogoutResponse.setLogoutSuccessMessage();
+                    return Mono.just(userLogoutResponse);
+                }
+        ).switchIfEmpty(Mono.error(new EmptyRequestException(UsersExceptionMessage.EmptyRequestMessage.getMessage())));
     }
 }
