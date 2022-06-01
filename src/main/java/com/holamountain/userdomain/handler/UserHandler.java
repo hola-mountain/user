@@ -15,6 +15,8 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.net.URI;
+
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
 @RequiredArgsConstructor
@@ -61,5 +63,14 @@ public class UserHandler {
         return ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(response, JwtTokenResponse.class);
+    }
+
+    public Mono<ServerResponse> verify(ServerRequest request) {
+        userService.verifyUserRegistration(request).log()
+                .subscribeOn(Schedulers.boundedElastic()).subscribe();
+
+        return ServerResponse
+                .temporaryRedirect(URI.create("http://holam-front-s3.s3-website.ap-northeast-2.amazonaws.com/"))
+                .build();
     }
 }

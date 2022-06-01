@@ -1,6 +1,17 @@
 spring:
   application:
     name: user-service
+  mail:
+    host: smtp.gmail.com
+    username: testsendmailgo@gmail.com
+    password: xyvildycxxoisjjw
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
   redis:
     host: 3.39.233.244
     port: 6379

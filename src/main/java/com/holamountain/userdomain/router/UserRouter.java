@@ -122,6 +122,7 @@ public class UserRouter {
                         .POST("/login", userHandler::login)
                         .POST("/logout", userHandler::logout)
                         .POST("/reissue", userHandler::reIssue)
+                        .GET("/auth/verify", userHandler::verify)
                 )
             )
             .build();

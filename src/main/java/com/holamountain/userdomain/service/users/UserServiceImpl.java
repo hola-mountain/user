@@ -1,6 +1,7 @@
 
 package com.holamountain.userdomain.service.users;
 
+import com.holamountain.userdomain.Utils.MailSenderUtil;
 import com.holamountain.userdomain.Utils.SHA256;
 import com.holamountain.userdomain.common.Message.UsersExceptionMessage;
 import com.holamountain.userdomain.common.UserEnums.UserType;
@@ -8,10 +9,12 @@ import com.holamountain.userdomain.dto.request.jwt.JwtTokenRequest;
 import com.holamountain.userdomain.dto.request.users.UserLoginRequest;
 import com.holamountain.userdomain.dto.request.users.UserLogoutRequest;
 import com.holamountain.userdomain.dto.request.users.UserRegistrationRequest;
+import com.holamountain.userdomain.dto.request.users.VerifyUserRegistrationRequest;
 import com.holamountain.userdomain.dto.response.jwt.JwtTokenResponse;
 import com.holamountain.userdomain.dto.response.users.UserLoginResponse;
 import com.holamountain.userdomain.dto.response.users.UserLogoutResponse;
 import com.holamountain.userdomain.dto.response.users.UserRegistrationResponse;
+import com.holamountain.userdomain.dto.response.users.VerifyUserRegistrationResponse;
 import com.holamountain.userdomain.exception.*;
 import com.holamountain.userdomain.jwt.JwtProvider;
 import com.holamountain.userdomain.jwt.JwtTokenInfo;
@@ -20,6 +23,8 @@ import com.holamountain.userdomain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
@@ -32,6 +37,9 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
     private final RedisTemplate redisTemplate;
+    private final RedisTemplate<String, Object> userRedisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
+    private final MailSenderUtil mailSenderUtil;
 
     @Override
     public Mono<UserLoginResponse> userLogin(ServerRequest serverRequest) {
@@ -109,6 +117,10 @@ public class UserServiceImpl implements UserService {
         if (!StringUtils.isBlank(userRegistrationRequest.getEmail()))
             userEntity.setEmail(userRegistrationRequest.getEmail());
 
+//        ValueOperations<String, Object> vop = userRedisTemplate.opsForValue();
+//        vop.set("toverify-"+userEntity.getNickName(), userEntity);
+//        mailSenderUtil.sendMail(userEntity.getEmail(), userEntity.getNickName(), 0);
+
         return userRepository.save(userEntity)
                 .switchIfEmpty(Mono.error(new FailUserRegistrationException(UsersExceptionMessage.FailUserRegistrationMessage.getMessage())));
     }
@@ -172,5 +184,30 @@ public class UserServiceImpl implements UserService {
                     return Mono.just(userLogoutResponse);
                 }
         ).switchIfEmpty(Mono.error(new EmptyRequestException(UsersExceptionMessage.EmptyRequestMessage.getMessage())));
+    }
+
+    @Override
+    public Mono<VerifyUserRegistrationResponse> verifyUserRegistration(ServerRequest serverRequest) {
+        String nickName = serverRequest.queryParam("nickname").get();
+        String key = serverRequest.queryParam("key").get();
+
+        VerifyUserRegistrationRequest verifyUserRegistrationRequest = VerifyUserRegistrationRequest.builder()
+                                                                                            .nickName(nickName)
+                                                                                            .key(key)
+                                                                                            .build();
+
+        return Mono.just(verifyUserRegistrationRequest).flatMap(user -> {
+            if (stringRedisTemplate.opsForValue().get("email-"+nickName).equals(key)) {
+                ValueOperations<String, Object> memvop = userRedisTemplate.opsForValue();
+                UserEntity userEntity = (UserEntity) memvop.get("toverify-"+nickName);
+                userRepository.save(userEntity);
+                stringRedisTemplate.delete("email-"+nickName);
+                userRedisTemplate.delete("toverify-"+nickName);
+            }
+
+            VerifyUserRegistrationResponse verifyUserRegistrationResponse = VerifyUserRegistrationResponse.builder().build();
+            verifyUserRegistrationResponse.setVerifySuccessMessage();
+            return Mono.just(verifyUserRegistrationResponse);
+        }).switchIfEmpty(Mono.error(new EmptyRequestException(UsersExceptionMessage.EmptyRequestMessage.getMessage())));
     }
 }
