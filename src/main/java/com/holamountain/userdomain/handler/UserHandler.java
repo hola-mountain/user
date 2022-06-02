@@ -6,6 +6,7 @@ import com.holamountain.userdomain.dto.response.jwt.JwtTokenResponse;
 import com.holamountain.userdomain.dto.response.users.UserLoginResponse;
 import com.holamountain.userdomain.dto.response.users.UserLogoutResponse;
 import com.holamountain.userdomain.dto.response.users.UserRegistrationResponse;
+import com.holamountain.userdomain.dto.response.users.VerifyUserRegistrationResponse;
 import com.holamountain.userdomain.service.users.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -66,11 +67,13 @@ public class UserHandler {
     }
 
     public Mono<ServerResponse> verify(ServerRequest request) {
-        userService.verifyUserRegistration(request).log()
-                .subscribeOn(Schedulers.boundedElastic()).subscribe();
+        Mono<VerifyUserRegistrationResponse> replaceMessage = userService.verifyUserRegistration(request)
+                                                    .subscribeOn(Schedulers.boundedElastic());
+
 
         return ServerResponse
-                .temporaryRedirect(URI.create("http://holam-front-s3.s3-website.ap-northeast-2.amazonaws.com/"))
-                .build();
+                .ok()
+                .contentType(MediaType.valueOf("text/html;charset=UTF-8"))
+                .body(replaceMessage.map(VerifyUserRegistrationResponse::getResultMessage), String.class);
     }
 }

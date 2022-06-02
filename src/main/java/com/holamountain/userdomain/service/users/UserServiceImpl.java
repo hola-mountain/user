@@ -121,6 +121,8 @@ public class UserServiceImpl implements UserService {
 //        vop.set("toverify-"+userEntity.getNickName(), userEntity);
 //        mailSenderUtil.sendMail(userEntity.getEmail(), userEntity.getNickName(), 0);
 
+//        return Mono.just(userEntity);
+
         return userRepository.save(userEntity)
                 .switchIfEmpty(Mono.error(new FailUserRegistrationException(UsersExceptionMessage.FailUserRegistrationMessage.getMessage())));
     }
@@ -135,7 +137,7 @@ public class UserServiceImpl implements UserService {
         ).switchIfEmpty(Mono.error(new EmptyRequestException(UsersExceptionMessage.EmptyRequestMessage.getMessage())));
     }
 
-    public Mono<JwtTokenResponse> validCheckJwtTokenInfo(JwtTokenRequest jwtTokenRequest) {
+    private Mono<JwtTokenResponse> validCheckJwtTokenInfo(JwtTokenRequest jwtTokenRequest) {
         Long userId = Long.parseLong(jwtProvider.getUserIdFromAccessToken(jwtTokenRequest.getAccessToken()));
         Mono<UserEntity> loginedUser = userRepository.findById(userId);
 
@@ -153,7 +155,7 @@ public class UserServiceImpl implements UserService {
                 });
     }
 
-    public Mono<JwtTokenResponse> getJwtTokenInfo(Mono<UserEntity> userEntityMono) {
+    private Mono<JwtTokenResponse> getJwtTokenInfo(Mono<UserEntity> userEntityMono) {
         return userEntityMono.flatMap(user -> {
             String accessToken = jwtProvider.createAccessJwtToken(user);
             JwtTokenInfo refreshTokenInfo = jwtProvider.createRefreshJwtToken(user);
@@ -197,17 +199,40 @@ public class UserServiceImpl implements UserService {
                                                                                             .build();
 
         return Mono.just(verifyUserRegistrationRequest).flatMap(user -> {
-            if (stringRedisTemplate.opsForValue().get("email-"+nickName).equals(key)) {
+            Mono<UserEntity> userEntityMono = userRepository.findByNickName(nickName);
+            VerifyUserRegistrationResponse verifyUserRegistrationResponse = VerifyUserRegistrationResponse.builder().build();
+            verifyUserRegistrationResponse.setDefaultMessage();
+
+            return checkEmailAuthVerify(userEntityMono, verifyUserRegistrationResponse, nickName, key);
+        }).switchIfEmpty(Mono.error(new EmptyRequestException(UsersExceptionMessage.EmptyRequestMessage.getMessage())));
+    }
+
+    private Mono<VerifyUserRegistrationResponse> checkEmailAuthVerify(Mono<UserEntity> userEntityMono
+                                                                    ,VerifyUserRegistrationResponse verifyUserRegistrationResponse
+                                                                    ,String nickName
+                                                                    ,String key) {
+        return userEntityMono.hasElement().flatMap(verifiedUser -> {
+                if (verifiedUser) {
+                    verifyUserRegistrationResponse.setVerifyFailDuplNickNameMessage();
+                    return Mono.just(verifyUserRegistrationResponse);
+                }
+
+                try {
+                    stringRedisTemplate.opsForValue().get("email-"+nickName).equals(key);
+                } catch (Exception e) {
+                    verifyUserRegistrationResponse.setVerifyFailNoInfoInRedisMessage();
+                    return Mono.just(verifyUserRegistrationResponse);
+                }
+
                 ValueOperations<String, Object> memvop = userRedisTemplate.opsForValue();
                 UserEntity userEntity = (UserEntity) memvop.get("toverify-"+nickName);
-                userRepository.save(userEntity);
-                stringRedisTemplate.delete("email-"+nickName);
-                userRedisTemplate.delete("toverify-"+nickName);
-            }
 
-            VerifyUserRegistrationResponse verifyUserRegistrationResponse = VerifyUserRegistrationResponse.builder().build();
-            verifyUserRegistrationResponse.setVerifySuccessMessage();
-            return Mono.just(verifyUserRegistrationResponse);
-        }).switchIfEmpty(Mono.error(new EmptyRequestException(UsersExceptionMessage.EmptyRequestMessage.getMessage())));
+                return userRepository.save(userEntity).flatMap(user -> {
+                    stringRedisTemplate.delete("email-"+nickName);
+                    userRedisTemplate.delete("toverify-"+nickName);
+                    verifyUserRegistrationResponse.setVerifySuccessMessage();
+                    return Mono.just(verifyUserRegistrationResponse);
+                });
+            });
     }
 }
