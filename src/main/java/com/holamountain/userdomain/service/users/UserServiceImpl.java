@@ -117,14 +117,14 @@ public class UserServiceImpl implements UserService {
         if (!StringUtils.isBlank(userRegistrationRequest.getEmail()))
             userEntity.setEmail(userRegistrationRequest.getEmail());
 
-//        ValueOperations<String, Object> vop = userRedisTemplate.opsForValue();
-//        vop.set("toverify-"+userEntity.getNickName(), userEntity);
-//        mailSenderUtil.sendMail(userEntity.getEmail(), userEntity.getNickName(), 0);
+        ValueOperations<String, Object> vop = userRedisTemplate.opsForValue();
+        vop.set("toverify-"+userEntity.getNickName(), userEntity);
+        mailSenderUtil.sendMail(userEntity.getEmail(), userEntity.getNickName(), 0);
 
-//        return Mono.just(userEntity);
+        return Mono.just(userEntity);
 
-        return userRepository.save(userEntity)
-                .switchIfEmpty(Mono.error(new FailUserRegistrationException(UsersExceptionMessage.FailUserRegistrationMessage.getMessage())));
+//        return userRepository.save(userEntity)
+//                .switchIfEmpty(Mono.error(new FailUserRegistrationException(UsersExceptionMessage.FailUserRegistrationMessage.getMessage())));
     }
 
     @Override
