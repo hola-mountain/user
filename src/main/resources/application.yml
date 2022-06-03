@@ -13,7 +13,7 @@ spring:
             enable: true
             required: true
   redis:
-    host: 52.79.250.213
+    host: 54.180.94.220
     port: 6379
     password: 123456
   r2dbc:
