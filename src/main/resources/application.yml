@@ -12,6 +12,7 @@ spring:
           starttls:
             enable: true
             required: true
+    port: 587
   redis:
     host: 54.180.94.220
     port: 6379
